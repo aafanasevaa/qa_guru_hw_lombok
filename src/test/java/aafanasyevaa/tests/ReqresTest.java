@@ -1,14 +1,18 @@
 package aafanasyevaa.tests;
 
+import aafanasyevaa.lombok.token.Token;
+import aafanasyevaa.lombok.token.TokenData;
+import aafanasyevaa.lombok.user.LombokUserData;
 import io.restassured.RestAssured;
 
-import static io.restassured.http.ContentType.JSON;
+import static aafanasyevaa.specs.Specs.requestSpec;
+import static aafanasyevaa.specs.Specs.responseSpec;
 import static org.hamcrest.core.Is.is;
 
-import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import static io.restassured.RestAssured.given;
 
@@ -23,29 +27,36 @@ public class ReqresTest {
     @DisplayName("LIST <RESOURCE>")
     public void getResourceList() {
         given()
+                .spec(requestSpec)
                 .when()
-                .get("api/unknown")
+                .get("/unknown")
                 .then()
-                .statusCode(200)
+                .spec(responseSpec)
                 .body("total", is(12));
     }
-
 
     @Test
     @DisplayName("LOGIN - SUCCESSFUL")
     public void SuccessfulLoginTest() {
 
         String expected_token = "QpwL5tke4Pnpja7X4";
-        Response response =
+        String email = "eve.holt@reqres.in";
+        String password = "cityslicka";
+
+        TokenData token =
         given()
-                .contentType(JSON)
+                .spec(requestSpec)
                 .body("{ \"email\": \"eve.holt@reqres.in\", \"password\": \"cityslicka\" }")
                 .when()
-                .post("api/login")
+                .post("/login")
                 .then()
-                .statusCode(200)
-                .extract().response();
+                .spec(responseSpec)
+                .log().body()
+                .extract().as(TokenData.class);
 
+        System.out.println(token.getToken());
     }
+
+//    "{ \"email\": \"eve.holt@reqres.in\", \"password\": \"cityslicka\" }"
 
 }
